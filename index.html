@@ -51,16 +51,45 @@
     <header>
       
   
-    <h1 class="title"><a href="/2019/05/08/bootstrap-父子表学习/">bootstrap 父子表学习</a></h1>
+    <h1 class="title"><a href="/2019/05/08/bootstrap-父子表学习/">Bootstrp 父子表的使用</a></h1>
   
 
       
-        <time datetime="2019-05-08T13:42:18.000Z">2019-05-08</time>
+        <time datetime="2019-05-08T10:44:00.000Z">2019-05-08</time>
       
     </header>
     <div class="entry">
       
-        <p><img src="/2019/05/08/bootstrap-父子表学习/123.jpeg" alt></p>
+        <p>​    前段时间有一个朋友问我bootstrp父子表怎么用，我以前对bootstrap的使用也止停留在用了用按钮的程度上，这次刚好自己也学习使用一下</p>
+<h2 id="1、bootstrap-table"><a href="#1、bootstrap-table" class="headerlink" title="1、bootstrap table"></a>1、bootstrap table</h2><p>​    bootstrap table是一款非常实用的表格组件，关于bootstrap table的配置属性这里就不多说了，大家可以自行百度，在这主要说说table创建表格后父子表的使用</p>
+<pre><code>第一步：创建table标签
+    ·&lt;table id=&quot;table&quot;&gt;&lt;/table&gt;·
+第二步：建表
+    ·$(&apos;#table&apos;).bootstrapTable(&apos;destroy&apos;).bootstrapTable()·
+    这里我们先销毁表在建表，防止加载子表时数据拿不到，导致子表空白
+第三步：配置属性
+    url: &apos;./data.json&apos;,//这里我把数据放在了json文件中通过ajax去调用
+    detailView: true, //开启子表模式
+</code></pre><h2 id="2、创建子表"><a href="#2、创建子表" class="headerlink" title="2、创建子表"></a>2、创建子表</h2><p>​    我写的知识一个模拟父子表的页面，样子就行这样</p>
+<p>​     <img src="/2019/05/08/bootstrap-父子表学习/father.png" alt></p>
+<p>​    这时，表格左侧就会出现一个 ‘+’  点击会出先另外一个表</p>
+<p>​    <img src="/2019/05/08/bootstrap-父子表学习/nodata.png" alt></p>
+<p>​    现在子表还是没有数据的，应为我们并没有给子表添加对应的数据，这时bootstrap有一个回调函数 ‘onExpandRow’ ，当点击 ‘+’ 时启用，接收三个参数，‘index， row， $detail’我们可以把加载字表的方法写在这个回调函数中<br>​<br>​    onExpandRow: function (index, row, $detail) {<br>​                var last = JSON.stringify(row);<br>​                onclick = row.id;<br>​                var parentId = row.id;<br>​                var prjLogBookProblemTable = $detail.html(‘<table></table>‘).find(‘table’);<br>​                $(prjLogBookProblemTable).bootstrapTable({<br>​                    columns: [],<br>​                    url: ‘./data.json’,<br>​                    method: ‘get’,<br>​                    queryParams: { parentId: parentId },<br>​                    contentType: “application/x-www-form-urlencoded; charset=UTF-8”,<br>​                    onLoadError: function () {  //加载失败时执行<br>​                        alert(‘失败’)<br>​                    },<br>​                })<br>​            }</p>
+<p>​    为了简单达到目的，本人对data.json数据重用，效果如下</p>
+<p><img src="/2019/05/08/bootstrap-父子表学习/img2.png" alt></p>
+<p>​    </p>
+<h3 id="3、操作栏控制子表"><a href="#3、操作栏控制子表" class="headerlink" title="3、操作栏控制子表"></a>3、操作栏控制子表</h3><p>​    可以看到，想要效果已经出来了，但是我们的业务中不太会出现 ‘+’ 加载子表的情况，一般都是点击操作栏中的小图标或者按钮加载出子表，就像我写的这个一样，想要点击 ‘查看会员数据’ 出现子表，再点击字表关闭</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">我这儿写了一个函数，直接将主表columns中的操作栏的formatter等于这个函数了</span><br><span class="line">​<span class="function"><span class="keyword">function</span> <span class="title">actionFormatter</span>(<span class="params">value, row, index</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> id = value;</span><br><span class="line">        <span class="keyword">var</span> result = <span class="string">""</span>;</span><br><span class="line">        result += <span class="string">"&lt;a href='javascript:;' class='btn btn-xs green' onclick=\"EditViewById('"</span> + index + <span class="string">"', view='view')\" title='查看'&gt;查看会员数据&lt;/a&gt;"</span>;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">  	可以看到我们点击的时候会调用一个EditViewById方法</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">EditViewById</span>(<span class="params">str</span>)</span>&#123;</span><br><span class="line">	  $(<span class="string">'#table'</span>).bootstrapTable(<span class="string">'collapseRow'</span>, index);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>​    在这个函数中 ‘collapseRow’ 意思是展开子表，‘expandRow’ 是关闭子表，这时，我朋友的需求已经基本达到了，但是他希望点击当前字表的时候，其他展开的子表收起来，这有点麻烦了，bootstrap中我没有找到控制所有子表的显示影藏属性和方法，这时该怎么做呢？</p>
+<p>​    观察了会儿bootstrap table的渲染布局，我想到了一个投机取巧的方法，我发现bootstrap table中渲染出来的tr都有一个自定义data属性代表当前的下标</p>
+<p><img src="/2019/05/08/bootstrap-父子表学习/img3.png" alt></p>
+<p>这样，我们可以先获取到所有的tr，然后都让子表隐藏，再让当前的子表显示就可以了，修改方法如下</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">EditViewById</span>(<span class="params">str</span>)</span>&#123;</span><br><span class="line">	str = str * <span class="number">1</span>;</span><br><span class="line">       $(<span class="string">'#table tr'</span>).each(<span class="function"><span class="keyword">function</span>(<span class="params">index</span>)</span>&#123;</span><br><span class="line">           <span class="keyword">if</span>($(<span class="keyword">this</span>).data(<span class="string">'index'</span>) !== str)&#123;</span><br><span class="line">               $(<span class="string">'#table'</span>).bootstrapTable(<span class="string">'collapseRow'</span>, $(<span class="keyword">this</span>).data(<span class="string">'index'</span>));</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;)</span><br><span class="line">       $(<span class="string">'#table'</span>).bootstrapTable(<span class="string">'expandRow'</span>, str);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>​    我们想要的效果就巧妙地实现了，应该还有很多方法，希望又不对的地方可以指正。</p>
+<p>​    邮箱地址：<a href="mailto:15234447741@163.com" target="_blank" rel="noopener">15234447741@163.com</a></p>
+<p>​    终于写完了，其实很早就像弄一个自己的博客网站，但是每次都没弄成，这次借助github，先把博客放上去，等自己的服务器开发完了，再迁移数据吧。总之前端的路还有很长很长，分享今天看到的一句话，很有感触，共勉！</p>
+<p>​    ‘对于程序员来说，如果哪一天开始他停止了学习，那么他的职业生涯便开始宣告消亡’</p>
 
       
     </div>
@@ -127,7 +156,7 @@
   <ul class="entry">
     
       <li>
-        <a href="/2019/05/08/bootstrap-父子表学习/">bootstrap 父子表学习</a>
+        <a href="/2019/05/08/bootstrap-父子表学习/">Bootstrp 父子表的使用</a>
       </li>
     
       <li>
