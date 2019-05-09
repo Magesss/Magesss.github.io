@@ -62,15 +62,8 @@
       
         <p>​    前段时间有一个朋友问我bootstrp父子表怎么用，我以前对bootstrap的使用也止停留在用了用按钮的程度上，这次刚好自己也学习使用一下</p>
 <h2 id="1、bootstrap-table"><a href="#1、bootstrap-table" class="headerlink" title="1、bootstrap table"></a>1、bootstrap table</h2><p>​    bootstrap table是一款非常实用的表格组件，关于bootstrap table的配置属性这里就不多说了，大家可以自行百度，在这主要说说table创建表格后父子表的使用</p>
-<pre><code>第一步：创建table标签
-    ·&lt;table id=&quot;table&quot;&gt;&lt;/table&gt;·
-第二步：建表
-    ·$(&apos;#table&apos;).bootstrapTable(&apos;destroy&apos;).bootstrapTable()·
-    这里我们先销毁表在建表，防止加载子表时数据拿不到，导致子表空白
-第三步：配置属性
-    url: &apos;./data.json&apos;,//这里我把数据放在了json文件中通过ajax去调用
-    detailView: true, //开启子表模式
-</code></pre><h2 id="2、创建子表"><a href="#2、创建子表" class="headerlink" title="2、创建子表"></a>2、创建子表</h2><p>​    我写的知识一个模拟父子表的页面，样子就行这样</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">第一步：创建table标签</span><br><span class="line">	·&lt;table id=<span class="string">"table"</span>&gt;&lt;/table&gt;·</span><br><span class="line">第二步：建表</span><br><span class="line">	·$(<span class="string">'#table'</span>).bootstrapTable(<span class="string">'destroy'</span>).bootstrapTable()·</span><br><span class="line">	这里我们先销毁表在建表，防止加载子表时数据拿不到，导致子表空白</span><br><span class="line">第三步：配置属性</span><br><span class="line">	url: <span class="string">'./data.json'</span>,<span class="comment">//这里我把数据放在了json文件中通过ajax去调用</span></span><br><span class="line">	detailView: <span class="literal">true</span>, <span class="comment">//开启子表模式</span></span><br></pre></td></tr></table></figure>
+<h2 id="2、创建子表"><a href="#2、创建子表" class="headerlink" title="2、创建子表"></a>2、创建子表</h2><p>​    我写的知识一个模拟父子表的页面，样子就行这样</p>
 <p>​     <img src="/2019/05/08/bootstrap-父子表学习/father.png" alt></p>
 <p>​    这时，表格左侧就会出现一个 ‘+’  点击会出先另外一个表</p>
 <p>​    <img src="/2019/05/08/bootstrap-父子表学习/nodata.png" alt></p>
@@ -87,7 +80,7 @@
 <p>这样，我们可以先获取到所有的tr，然后都让子表隐藏，再让当前的子表显示就可以了，修改方法如下</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">EditViewById</span>(<span class="params">str</span>)</span>&#123;</span><br><span class="line">	str = str * <span class="number">1</span>;</span><br><span class="line">       $(<span class="string">'#table tr'</span>).each(<span class="function"><span class="keyword">function</span>(<span class="params">index</span>)</span>&#123;</span><br><span class="line">           <span class="keyword">if</span>($(<span class="keyword">this</span>).data(<span class="string">'index'</span>) !== str)&#123;</span><br><span class="line">               $(<span class="string">'#table'</span>).bootstrapTable(<span class="string">'collapseRow'</span>, $(<span class="keyword">this</span>).data(<span class="string">'index'</span>));</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;)</span><br><span class="line">       $(<span class="string">'#table'</span>).bootstrapTable(<span class="string">'expandRow'</span>, str);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
 <p>​    我们想要的效果就巧妙地实现了，应该还有很多方法，希望又不对的地方可以指正。</p>
-<p>​    邮箱地址：<a href="mailto:15234447741@163.com" target="_blank" rel="noopener">15234447741@163.com</a></p>
+<p>​    <!--邮箱地址：15234447741@163.com--></p>
 <p>​    终于写完了，其实很早就像弄一个自己的博客网站，但是每次都没弄成，这次借助github，先把博客放上去，等自己的服务器开发完了，再迁移数据吧。总之前端的路还有很长很长，分享今天看到的一句话，很有感触，共勉！</p>
 <p>​    ‘对于程序员来说，如果哪一天开始他停止了学习，那么他的职业生涯便开始宣告消亡’</p>
 
