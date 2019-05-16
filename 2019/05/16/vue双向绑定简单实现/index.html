@@ -3,13 +3,19 @@
 <head><meta name="generator" content="Hexo 3.8.0">
   <meta charset="utf-8">
   
-  <title>Magesss</title>
+  <title>vue双向绑定简单实现 › Magesss</title>
   <meta name="author" content="magesss">
+  
+  <meta name="description" content="​    学习vue也有一段时间了，我师傅推荐我去学习学习vue源码，但是不是没看，真心看不懂呐。所以还是从原理入手学习，vue双向数据流，diff算法，这些感觉都很高大上的样子，写个文档总结一下。
+1、观察者模式
+​    3个东西  
+​            1、observer  观察者
+​">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  
+  <meta property="og:title" content="vue双向绑定简单实现">
   <meta property="og:site_name" content="Magesss">
 
   
@@ -45,13 +51,12 @@
 <div class="clearfix"></div>
 </header>
   <div id="content" class="inner">
-    <div id="main-col" class="alignleft"><div id="wrapper">
-  <article class="post">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
   <div class="post-content">
     <header>
       
   
-    <h1 class="title"><a href="/2019/05/16/vue双向绑定简单实现/">vue双向绑定简单实现</a></h1>
+    <h1 class="title">vue双向绑定简单实现</h1>
   
 
       
@@ -114,162 +119,45 @@
       
     </div>
       
+      <footer>
         
         
+  
+  <div class="tags">
+    <a href="/tags/Magesss/">Magesss</a>
+  </div>
+
+        
+  <div class="addthis addthis_toolbox addthis_default_style">
+    
+      <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+    
+      <a class="addthis_button_tweet"></a>
+    
+    
+      <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+    
+      <a class="addthis_button_pinterest_pinit" pi:pinit:layout="horizontal"></a>
+    
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js"></script>
+
       
       <div class="clearfix"></div>
-      
+      </footer>
   </div>
 </article>
 
 
-
-
-
-  <article class="post">
-  <div class="post-content">
-    <header>
-      
+<section id="comment">
   
-    <h1 class="title"><a href="/2019/05/09/函数尾调用/">函数尾调用</a></h1>
-  
-
-      
-        <time datetime="2019-05-09T09:53:00.000Z">2019-05-09</time>
-      
-    </header>
-    <div class="entry">
-      
-        <p>​        这几天看书的时候遇到一个很有意思的东西，<strong>尾递归优化</strong>，做笔记来学习一下。</p>
-<h1 id="1、什么是尾调用"><a href="#1、什么是尾调用" class="headerlink" title="1、什么是尾调用"></a>1、什么是尾调用</h1><p>​        我们都知道，函数调用时会在内存保留当前的变量、调用位置等信息，我们称为调用帧，当在函数A中调用函数B时，函数A的上层就会形成一个函数B的调用帧，当又在B中调用函数C时，就还有一个C的调用帧，以此类推，一帧一帧的就会形成一个调用栈。</p>
-<p>​        而尾调用的意思顾名思义，那就是 <strong>尾部调用</strong>，就是说某个函数的尾部去调用另一个函数。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//一定是最后一步</span></span><br><span class="line">f(x)&#123;</span><br><span class="line">       y=g(x);</span><br><span class="line">       <span class="keyword">return</span> y</span><br><span class="line">   &#125; <span class="comment">// no</span></span><br><span class="line">f(x)&#123;</span><br><span class="line">       <span class="keyword">return</span> g(x) + <span class="number">1</span></span><br><span class="line">   &#125; <span class="comment">// no</span></span><br><span class="line">f(x)&#123;</span><br><span class="line">       g(x)</span><br><span class="line">   &#125; <span class="comment">// no</span></span><br><span class="line">f(x)&#123;</span><br><span class="line">       <span class="keyword">return</span> g(x)</span><br><span class="line">   &#125; <span class="comment">// yes</span></span><br></pre></td></tr></table></figure>
-<p>​        尾调用必须是严格的形式，在函数最后一步执行就可以</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">f(x)&#123;</span><br><span class="line">	<span class="keyword">if</span>(x&gt;<span class="number">0</span>)&#123;</span><br><span class="line">		<span class="keyword">return</span> m(x)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> g(x)</span><br><span class="line">&#125; <span class="comment">// 这个也是尾调用</span></span><br></pre></td></tr></table></figure>
-<h1 id="2、尾调用的意义"><a href="#2、尾调用的意义" class="headerlink" title="2、尾调用的意义"></a>2、尾调用的意义</h1><p>​        尾调用由于是函数的最后一步操作，所以不需要保存外层函数的调用帧，因为调用位置，内部变量等信息都不会再用到了，直接用内层函数的调用帧取代外层的调用帧就行。</p>
-<hr>
-<p>​        尾调用优化：只保留外层函数的调用帧，如果所有函数都是尾调用，那么完全可以做到每次执行时调用帧只有一项，这将大大节省内存，这就是尾调用的意义</p>
-<h1 id="3、尾调用实例"><a href="#3、尾调用实例" class="headerlink" title="3、尾调用实例"></a>3、尾调用实例</h1><p>​        我们都知道，递归是非常消耗内存的，需要保存称成白上千个调用帧，很容易发生栈溢出。我们来看一个递归。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Fibonacci</span>(<span class="params">n</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(n &lt;= <span class="number">1</span>)&#123;<span class="keyword">return</span> <span class="number">1</span>&#125;</span><br><span class="line">	<span class="keyword">return</span> Fibonacci(n - <span class="number">1</span>) + Fibonacci(n - <span class="number">2</span>)</span><br><span class="line">&#125;</span><br><span class="line">Fibonacci(<span class="number">10</span>)  <span class="comment">// 89</span></span><br><span class="line">Fibonacci(<span class="number">100</span>) <span class="comment">// 栈溢出</span></span><br><span class="line"><span class="comment">// 尾递归优化后的Fibonacco</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Fibonacci2</span>(<span class="params">n, a1 = <span class="number">1</span>, a2 = <span class="number">1</span></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(n &lt;= <span class="number">1</span>)&#123;<span class="keyword">return</span> a2&#125;</span><br><span class="line">	<span class="keyword">return</span> Fibonacci2(n - <span class="number">1</span>, a2, a2 + a1)</span><br><span class="line">&#125;</span><br><span class="line">Fibonacci2(<span class="number">100</span>) <span class="comment">// 573147844013817200000</span></span><br></pre></td></tr></table></figure>
-<p>​        所以，尾调用优化对递归来说意义重大，所以ES6明确规定，所有ECMAScript的实现都必须部署“尾调用优化”。这就是说，再ES6中，只要使用尾递归，就不会发生栈溢出，相对会节省很大内存。</p>
-<h1 id="4、对尾调用优化的实现"><a href="#4、对尾调用优化的实现" class="headerlink" title="4、对尾调用优化的实现"></a>4、对尾调用优化的实现</h1><p>​    我学习中遇到一个很有意思的函数，下面就重点详细讲解一下这个函数。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">tco</span>(<span class="params">f</span>)</span>&#123;</span><br><span class="line">       <span class="keyword">var</span> value;</span><br><span class="line">       <span class="keyword">var</span> active = <span class="literal">false</span>;</span><br><span class="line">       <span class="keyword">var</span> accumulated = [];</span><br><span class="line">       <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">accumulator</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">           accumulated.push(<span class="built_in">arguments</span>);</span><br><span class="line">           <span class="keyword">if</span>(!active)&#123;</span><br><span class="line">               active = <span class="literal">true</span>;</span><br><span class="line">               <span class="keyword">while</span>(accumulated.length)&#123;</span><br><span class="line">                   value = f.apply(<span class="keyword">this</span>,accumulated.shift());</span><br><span class="line">               &#125;</span><br><span class="line">               active = <span class="literal">false</span>;</span><br><span class="line">               <span class="keyword">return</span> value;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">var</span> sum = tco(<span class="function"><span class="keyword">function</span>(<span class="params">x,y</span>)</span>&#123;</span><br><span class="line">       <span class="keyword">if</span>(y&gt;<span class="number">0</span>)&#123;</span><br><span class="line">           <span class="keyword">return</span> sum(x+<span class="number">1</span>,y<span class="number">-1</span>)</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">else</span>&#123;</span><br><span class="line">           <span class="keyword">return</span> x;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;)</span><br><span class="line">   sum(<span class="number">1</span>,<span class="number">10000</span>)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>​    在这个函数中 toc 函数是尾递归优化的实现，变量active在默认情况下是不被激活的，进入尾递归后，这个变量就激活了。然后每一轮sum返回的都是undefined， 所以避免了递归执行，而accumulated数组存放每一轮sum执行的参数，总是有值的，这就保证了accumulator函数内部的while循环总会执行，很巧妙地将“递归”改成了“循环”，而后一轮的参数会取带前一轮的参数，保证了调用栈只有一层。</p>
-</blockquote>
-<p>​    上面是书上对这个代码的解释，我们从头看起…</p>
-<p>​    accumulator函数是一个闭包函数，他可以操作三个相对外部变量value、active、accumulated</p>
-<p>当执行tco函数返回的accumulator函数初始化的时候内部变量是这样的：</p>
-<p><img src="/2019/05/09/函数尾调用/1.png" alt="1"></p>
-<p>我们执行sum(1, 10000)时，首先内部的accumulated先存一下arguments，结果时这样的：</p>
-<p>​    <img src="/2019/05/09/函数尾调用/2.png" alt="2"></p>
-<p>​        进入递归，首先将active改为true，走到while中，通过apply每次都产生一个新的函数，将accumulated中的那个arguments前删，shift返回的时被删除的元素，所以这儿传入f函数的参数，也就是1和10000，而同时又清空了accumulated数组，这时执行f函数，他内部因为传入的 y (现在是1000)大于 0，所以再一次调用 sum 函数，执行accumulator函数，此时的accumulator函数中accumulated数组是空的，active 是 true 所以函数直接执行完毕，但是这个时候accumulated中紧接着又push了一个arguments值的，所以返回的 value 是 undefined ，但是 while 的循环条件却还是 1.  递归直接变成了循环。</p>
-<p>这种思路感觉太妙了，将函数变循环，果真大神也，就是对我这种小菜鸟理解起来不是很好理解，最近在学习总结 ES6， 感觉自己以前了解的 ES6 只是一个皮毛而已，慢慢保持两三天写一篇博客的速度把，还有很多要学习的，愿自己  <strong>历尽磨难，不忘初心</strong></p>
-
-      
-    </div>
-      
-        
-        
-      
-      <div class="clearfix"></div>
-      
-  </div>
-</article>
+</section>
 
 
-
-
-
-  <article class="post">
-  <div class="post-content">
-    <header>
-      
-  
-    <h1 class="title"><a href="/2019/05/08/bootstrap-父子表学习/">Bootstrp 父子表的使用</a></h1>
-  
-
-      
-        <time datetime="2019-05-08T10:44:00.000Z">2019-05-08</time>
-      
-    </header>
-    <div class="entry">
-      
-        <p>​    前段时间有一个朋友问我bootstrp父子表怎么用，我以前对bootstrap的使用也止停留在用了用按钮的程度上，这次刚好自己也学习使用一下</p>
-<h2 id="1、bootstrap-table"><a href="#1、bootstrap-table" class="headerlink" title="1、bootstrap table"></a>1、bootstrap table</h2><p>​    bootstrap table是一款非常实用的表格组件，关于bootstrap table的配置属性这里就不多说了，大家可以自行百度，在这主要说说table创建表格后父子表的使用</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">第一步：创建table标签</span><br><span class="line">	·&lt;table id=<span class="string">"table"</span>&gt;&lt;/table&gt;·</span><br><span class="line">第二步：建表</span><br><span class="line">	·$(<span class="string">'#table'</span>).bootstrapTable(<span class="string">'destroy'</span>).bootstrapTable()·</span><br><span class="line">	这里我们先销毁表在建表，防止加载子表时数据拿不到，导致子表空白</span><br><span class="line">第三步：配置属性</span><br><span class="line">	url: <span class="string">'./data.json'</span>,<span class="comment">//这里我把数据放在了json文件中通过ajax去调用</span></span><br><span class="line">	detailView: <span class="literal">true</span>, <span class="comment">//开启子表模式</span></span><br></pre></td></tr></table></figure>
-<h2 id="2、创建子表"><a href="#2、创建子表" class="headerlink" title="2、创建子表"></a>2、创建子表</h2><p>​    我写的知识一个模拟父子表的页面，样子就行这样</p>
-<p>​     <img src="/2019/05/08/bootstrap-父子表学习/father.png" alt></p>
-<p>​    这时，表格左侧就会出现一个 ‘+’  点击会出先另外一个表</p>
-<p>​    <img src="/2019/05/08/bootstrap-父子表学习/nodata.png" alt></p>
-<p>​    现在子表还是没有数据的，应为我们并没有给子表添加对应的数据，这时bootstrap有一个回调函数 ‘onExpandRow’ ，当点击 ‘+’ 时启用，接收三个参数，‘index， row， $detail’我们可以把加载字表的方法写在这个回调函数中<br>​<br>​    onExpandRow: function (index, row, $detail) {<br>​                var last = JSON.stringify(row);<br>​                onclick = row.id;<br>​                var parentId = row.id;<br>​                var prjLogBookProblemTable = $detail.html(‘<table></table>‘).find(‘table’);<br>​                $(prjLogBookProblemTable).bootstrapTable({<br>​                    columns: [],<br>​                    url: ‘./data.json’,<br>​                    method: ‘get’,<br>​                    queryParams: { parentId: parentId },<br>​                    contentType: “application/x-www-form-urlencoded; charset=UTF-8”,<br>​                    onLoadError: function () {  //加载失败时执行<br>​                        alert(‘失败’)<br>​                    },<br>​                })<br>​            }</p>
-<p>​    为了简单达到目的，本人对data.json数据重用，效果如下</p>
-<p><img src="/2019/05/08/bootstrap-父子表学习/img2.png" alt></p>
-<p>​    </p>
-<h3 id="3、操作栏控制子表"><a href="#3、操作栏控制子表" class="headerlink" title="3、操作栏控制子表"></a>3、操作栏控制子表</h3><p>​    可以看到，想要效果已经出来了，但是我们的业务中不太会出现 ‘+’ 加载子表的情况，一般都是点击操作栏中的小图标或者按钮加载出子表，就像我写的这个一样，想要点击 ‘查看会员数据’ 出现子表，再点击字表关闭</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">我这儿写了一个函数，直接将主表columns中的操作栏的formatter等于这个函数了</span><br><span class="line">​<span class="function"><span class="keyword">function</span> <span class="title">actionFormatter</span>(<span class="params">value, row, index</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> id = value;</span><br><span class="line">        <span class="keyword">var</span> result = <span class="string">""</span>;</span><br><span class="line">        result += <span class="string">"&lt;a href='javascript:;' class='btn btn-xs green' onclick=\"EditViewById('"</span> + index + <span class="string">"', view='view')\" title='查看'&gt;查看会员数据&lt;/a&gt;"</span>;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">  	可以看到我们点击的时候会调用一个EditViewById方法</span><br></pre></td></tr></table></figure>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">EditViewById</span>(<span class="params">str</span>)</span>&#123;</span><br><span class="line">	  $(<span class="string">'#table'</span>).bootstrapTable(<span class="string">'collapseRow'</span>, index);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
-<p>​    在这个函数中 ‘collapseRow’ 意思是展开子表，‘expandRow’ 是关闭子表，这时，我朋友的需求已经基本达到了，但是他希望点击当前字表的时候，其他展开的子表收起来，这有点麻烦了，bootstrap中我没有找到控制所有子表的显示影藏属性和方法，这时该怎么做呢？</p>
-<p>​    观察了会儿bootstrap table的渲染布局，我想到了一个投机取巧的方法，我发现bootstrap table中渲染出来的tr都有一个自定义data属性代表当前的下标</p>
-<p><img src="/2019/05/08/bootstrap-父子表学习/img3.png" alt></p>
-<p>这样，我们可以先获取到所有的tr，然后都让子表隐藏，再让当前的子表显示就可以了，修改方法如下</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">EditViewById</span>(<span class="params">str</span>)</span>&#123;</span><br><span class="line">	str = str * <span class="number">1</span>;</span><br><span class="line">       $(<span class="string">'#table tr'</span>).each(<span class="function"><span class="keyword">function</span>(<span class="params">index</span>)</span>&#123;</span><br><span class="line">           <span class="keyword">if</span>($(<span class="keyword">this</span>).data(<span class="string">'index'</span>) !== str)&#123;</span><br><span class="line">               $(<span class="string">'#table'</span>).bootstrapTable(<span class="string">'collapseRow'</span>, $(<span class="keyword">this</span>).data(<span class="string">'index'</span>));</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;)</span><br><span class="line">       $(<span class="string">'#table'</span>).bootstrapTable(<span class="string">'expandRow'</span>, str);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-<p>​    我们想要的效果就巧妙地实现了，应该还有很多方法，希望又不对的地方可以指正。</p>
-<p>​    <!--邮箱地址：15234447741@163.com--></p>
-<p>​    终于写完了，其实很早就像弄一个自己的博客网站，但是每次都没弄成，这次借助github，先把博客放上去，等自己的服务器开发完了，再迁移数据吧。总之前端的路还有很长很长，分享今天看到的一句话，很有感触，共勉！</p>
-<p>​    ‘对于程序员来说，如果哪一天开始他停止了学习，那么他的职业生涯便开始宣告消亡’</p>
-
-      
-    </div>
-      
-        
-        
-      
-      <div class="clearfix"></div>
-      
-  </div>
-</article>
-
-
-
-
-
-  <article class="post">
-  <div class="post-content">
-    <header>
-      
-  
-    <h1 class="title"><a href="/2019/05/08/你好-Hexo/">你好,Hexo</a></h1>
-  
-
-      
-        <time datetime="2019-05-08T10:44:00.000Z">2019-05-08</time>
-      
-    </header>
-    <div class="entry">
-      
-        
-      
-    </div>
-      
-        
-        
-      
-      <div class="clearfix"></div>
-      
-  </div>
-</article>
-
-
-
-
-
-
-<nav id="pagination">
-  
-  
-  <div class="clearfix"></div>
-</nav></div></div>
+</div></div>
     <aside id="sidebar" class="alignright">
   <div class="search">
   <form action="//google.com/search" method="get" accept-charset="utf-8">
