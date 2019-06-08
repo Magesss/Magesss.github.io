@@ -51,6 +51,211 @@
     <header>
       
   
+    <h1 class="title"><a href="/2019/06/08/VUE6组件6中通信方式/">VUE6组件6中通信方式</a></h1>
+  
+
+      
+        <time datetime="2019-06-08T05:04:22.000Z">2019-06-08</time>
+      
+    </header>
+    <div class="entry">
+      
+        <p>vue 组件传值的 6 中方式</p>
+<p>总结一下 vue 组件通信的 6 种方式，废话少说,直接开敲</p>
+<h2 id="一、props-emit"><a href="#一、props-emit" class="headerlink" title="一、props/$emit"></a>一、props/$emit</h2><p>​    1、子组件标签上定义的属性绑定父组件中的数据，然后子组件通过props接收</p>
+<pre><code>&lt;!--父组件 --&gt;
+&lt;template&gt;
+    &lt;div&gt;
+        &lt;div @click=&quot;change&quot; :style=&quot;{&apos;color&apos;: color}&quot;&gt;parent&lt;/div&gt;
+        &lt;users :users=&quot;users&quot;&gt;&lt;/users&gt;
+    &lt;/div&gt;
+&lt;/template&gt;
+export default {
+    data () {
+        return {
+            users: [&apos;join&apos;, &apos;bucky&apos;, &apos;mariny&apos;]
+        }
+    }
+}
+&lt;!-- users 子组件 --&gt;
+&lt;template&gt;
+    &lt;div&gt;
+        {{users.join(', ')}}
+    &lt;/div&gt;
+&lt;/template&gt;
+export default{
+    props: {
+        users: {
+            type: Array,
+            default: () =&gt; []
+        }
+    }
+}
+</code></pre><p>​    2、子组件通过$emit将事件发送出去，执行父组件中定义的事件</p>
+<pre><code>    &lt;!-- 父组件 --&gt;
+    &lt;users @test=&apos;test&apos; :users=&quot;users&quot;&gt;&lt;/users&gt;
+    methods: {
+        test (data) {
+            console.log(&apos;接收到了，数据是:&apos;, data)
+        }
+    }
+
+&lt;!-- users 子组件 --&gt;
+&lt;div @click=&apos;send&apos;&gt;
+    {{users.join(', ')}}
+&lt;/div&gt;
+methods: {
+    send () {
+        this.$emit(&apos;test&apos;, &apos;from users data&apos;)
+    }
+}
+</code></pre><h2 id="二、-emit-on"><a href="#二、-emit-on" class="headerlink" title="二、$emit/$on"></a>二、$emit/$on</h2><pre><code>&lt;!--父组件--&gt;
+//先导入一个bus文件导出的vue
+const Event = () =&gt; import(&apos;./bus.js&apos;)
+//在 mounted 里面注册一个监听事件
+mounted () {
+    Event.$on(&apos;send-from&apos;, () =&gt; {
+        this.title = &apos;from组件修改的title！&apos;
+    })
+    Event.$on(&apos;send-users&apos;, () =&gt; {
+        this.title = &apos;users组件修改的title!&apos;
+    })
+}
+//在对应的子组件中通过 $emit 发送事件就可以
+&lt;!-- from 子组件--&gt;
+    //先导入 bus， 通过bus发送
+    const Event = () =&gt; import(&apos;./bus.js&apos;)
+    methods: {
+        test () {
+            Event.$em(&apos;send-from&apos;)
+        }
+    }
+&lt;!-- users 子组件--&gt;
+    const Event = () =&gt; import(&apos;./bus.js&apos;)
+    methods: {
+        test () {
+            Event.$em(&apos;send-users&apos;)
+        }
+    }
+</code></pre><h2 id="三、vuex"><a href="#三、vuex" class="headerlink" title="三、vuex"></a>三、vuex</h2><p>​    没什么好说的，傻瓜式步骤</p>
+<h2 id="四、-attr-listeners-Vue-2-4"><a href="#四、-attr-listeners-Vue-2-4" class="headerlink" title="四、$attr/$listeners (Vue 2.4)"></a>四、$attr/$listeners (Vue 2.4)</h2><p>​    组件之间的关系写成这样的，直观一点</p>
+<p>​    父组件 &gt; child-com1 -&gt; child-com2 -&gt; child-com3 一级一级嵌套</p>
+<pre><code>&lt;!-- 父组件 --&gt;
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;div class=&quot;title&quot;&gt;parent&lt;/div&gt;
+    &lt;div class=&quot;give&quot;&gt;传入第一代的属性：{{this.$data}}和 title&lt;/div&gt;
+    &lt;div class=&quot;child&quot;&gt;
+      &lt;child-com1
+        :foo=&quot;foo&quot;
+        :boo=&quot;boo&quot;
+        :zoo=&quot;zoo&quot;
+        :doo=&quot;doo&quot;
+        @Foo=&quot;Foo&quot;
+        @Boo=&quot;Boo&quot;
+        @Zoo=&quot;Zoo&quot;
+        @Doo=&quot;Doo&quot;
+        title=&quot;child-com1-title&quot;
+      &gt;&lt;/child-com1&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+data () {
+   return {
+     foo: &apos;foo&apos;,
+     boo: &apos;boo&apos;,
+     zoo: &apos;zoo&apos;,
+     doo: &apos;doo&apos;
+   }
+ }
+ methods: {
+    Foo (data) {
+      console.log(&apos;Foo&apos;, data)
+    },
+    Boo (data) {
+      console.log(&apos;Boo&apos;, data)
+    },
+    Zoo (data) {
+      console.log(&apos;Zoo&apos;, data)
+    },
+    Doo (data) {
+      console.log(&apos;Doo&apos;, data)
+    }
+  }
+
+ // chlid-com1一共传入5个属性， 4个自定义事件
+ &lt;!-- child-com1 --&gt;
+ &lt;template&gt;
+  &lt;div&gt;
+    &lt;div class=&quot;title&quot;&gt;{{title}}&lt;/div&gt;
+    &lt;div class=&quot;console&quot;&gt;$attrs： {{$attrs}}&lt;/div&gt;
+    &lt;child-com2 v-on=&quot;$listeners&quot; v-bind=&quot;$attrs&quot;&gt;&lt;/child-com2&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+// 通过$attrs存放着父组件传过来，但是没有通过props接收到的属性，也就是说，props中接收了一个title，所以这时的$attrs里面有4个而不是5个属性
+//事件通过$listeners接收，触发事件还是正常用$emit
+   //要向child-com2中传入这些属性直接通过v-bind=&apos;$attrs&apos; 就可以了,事件通过v-on
+    props: {
+        title: {
+          type: String
+        }
+      }
+</code></pre><p>附一张图</p>
+<p>​    <img src="/2019/06/08/VUE6组件6中通信方式/1.png" alt></p>
+<h2 id="五、provide-inject"><a href="#五、provide-inject" class="headerlink" title="五、provide/inject"></a>五、provide/inject</h2><p>​    vue 2.2.0新增的一个api，允许一个祖先组件向其所有子孙后代注入一个依赖，不论组件层次有多深。也就是说，祖先组件通过provide来提供变量，然后子孙组件通过inject来注入变量，主要解决跨级组件的通讯问题。</p>
+<pre><code>&lt;!-- parent --&gt;
+provide: {
+    name: &apos;6月5日到了，祝你生日快乐&apos;
+}
+&lt;!-- users --&gt;
+inject: [&apos;name&apos;]
+</code></pre><p>​    但是这并不是响应式的，要做成响应式的话可以向 provide 提供祖先组件的 this 的，但 this 东西太多，我们采用官方推荐的 Vue.observable 方法</p>
+<pre><code>&lt;!-- parent --&gt;
+provide () {
+    this.theme = Vue.observable({
+      color: this.color
+    })
+    return {
+      theme: this.theme
+    }
+ },
+ //修改的时候直接修改this.theme.color就可以了，子孙组建的数据也会变的
+&lt;!-- users --&gt;
+inject: {
+    theme: {
+        default: () =&gt; ({})
+    }
+},
+//子组件template为functional时推荐用 injections.theme.color
+</code></pre><h2 id="六、-parent-children-与-ref"><a href="#六、-parent-children-与-ref" class="headerlink" title="六、$parent/$children  与 ref"></a>六、$parent/$children  与 ref</h2><p>​    1、$parent 取父组件实例， $children 取子组件实例 </p>
+<p>​    2、ref如果时标签直接取真实dom节点，如果是组件，返回组建实例</p>
+<h2 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h2><p>​    父子通信：props 和 $emit、$parent和$children、ref、provide和inject、$attrs和$listeners</p>
+<p>​    兄弟通信：Bus 和 vuex</p>
+<p>​    跨级通信：Bus、vuex、provide和inject、$attrs和$listeners</p>
+<p>​    代码纯手打，拷贝可能会有问题，望包涵！</p>
+<hr>
+<p> 今天是你生日，在你看不到的地方默默祝你生日快乐！</p>
+
+      
+    </div>
+      
+        
+        
+      
+      <div class="clearfix"></div>
+      
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  <div class="post-content">
+    <header>
+      
+  
     <h1 class="title"><a href="/2019/05/16/vue双向绑定简单实现/">vue双向绑定简单实现</a></h1>
   
 
@@ -108,7 +313,7 @@
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//我们通过构造函数来生成 订阅者</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Watcher</span>(<span class="params">el,attr,vm,val</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.el = el <span class="comment">//标签</span></span><br><span class="line">	<span class="keyword">this</span>.attr = attr	<span class="comment">//标签属性</span></span><br><span class="line">	<span class="keyword">this</span>.vm = vm	<span class="comment">//实例</span></span><br><span class="line">	<span class="keyword">this</span>.val = val	<span class="comment">//实例中数据</span></span><br><span class="line">	<span class="keyword">this</span>.updata()</span><br><span class="line">&#125;</span><br><span class="line">Watcher.prototype.updata = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="comment">//我们要做的也就是数据视图同步</span></span><br><span class="line">		<span class="comment">//input[value] = data[test]  就像这样</span></span><br><span class="line">	<span class="keyword">this</span>.el[<span class="keyword">this</span>.attr] = <span class="keyword">this</span>.vm.$data[<span class="keyword">this</span>.val]</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//大功告成  我们把上面的编译器改改</span></span><br></pre></td></tr></table></figure>
 <h3 id="5、在编译器中构造订阅者"><a href="#5、在编译器中构造订阅者" class="headerlink" title="5、在编译器中构造订阅者"></a>5、在编译器中构造订阅者</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Fang</span>(<span class="params">options</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.$el = <span class="built_in">document</span>.querySelector(options.el)</span><br><span class="line">	<span class="keyword">this</span>.$data = options.$data</span><br><span class="line">	<span class="keyword">this</span>.$methods = options.methods</span><br><span class="line">	<span class="keyword">this</span>.binding = &#123;&#125; <span class="comment">// 用来存放订阅者的地方  &#123;test: [...]&#125; 这种格式</span></span><br><span class="line">	<span class="keyword">this</span>.observer()</span><br><span class="line">	<span class="keyword">this</span>.compile(<span class="keyword">this</span>.$el)</span><br><span class="line">&#125;</span><br><span class="line">Fang.prototype.compile = <span class="function"><span class="keyword">function</span>(<span class="params">el</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">let</span> nodes = el.children</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">let</span> i = <span class="number">0</span>;i &lt; nodes.length;i ++)&#123;</span><br><span class="line">		<span class="keyword">let</span> node = nodes[i]</span><br><span class="line">		<span class="comment">//判断是不是有子节点，递归处理，建议学习一下前一篇的尾递归优化</span></span><br><span class="line">		<span class="keyword">if</span>(node.children.length &gt; <span class="number">0</span>)&#123;</span><br><span class="line">			<span class="keyword">this</span>.compile(node)</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">console</span>.log(node)<span class="comment">//得到全部的子孙节点</span></span><br><span class="line">		<span class="comment">//解析指令,我简单实现一下，vue肯定比这个复杂多了</span></span><br><span class="line">		<span class="comment">//解析 fbb-on:click</span></span><br><span class="line">		<span class="keyword">if</span>(node.hasAttrbuite(<span class="string">'fbb-on:click'</span>))&#123;</span><br><span class="line">			<span class="keyword">let</span> attrVal = node.getAttrbuite(<span class="string">'fbb-on:click'</span>)</span><br><span class="line">			node.addEventListener(<span class="string">'click'</span>, <span class="keyword">this</span>.$methods[attrVal].bind(<span class="keyword">this</span>.$data)) <span class="comment">//将methods中的this指向data</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//解析 fbb-model</span></span><br><span class="line">		<span class="keyword">if</span>(node.hasAttrbuite(<span class="string">'fbb-model'</span>) &amp;&amp; node.targetName==<span class="string">'INPUT'</span>)&#123;</span><br><span class="line">			<span class="keyword">let</span> attrVal = node.getAttrbuite(<span class="string">'fbb-model'</span>)</span><br><span class="line">			</span><br><span class="line">			<span class="comment">//我们数据发生变化了，构造一个订阅者来负责同步</span></span><br><span class="line">			<span class="comment">//new Watcher(node, 'value', this, attrVal)</span></span><br><span class="line">			<span class="keyword">this</span>.binding[attrVal].push(<span class="keyword">new</span> Watcher(node, <span class="string">'value'</span>, <span class="keyword">this</span>, attrVal))<span class="comment">//这样就可以了</span></span><br><span class="line">			</span><br><span class="line">			node.addEventListener(<span class="string">'input'</span>,(<span class="function">(<span class="params">i</span>)=&gt;</span>&#123;</span><br><span class="line">				<span class="comment">//玩点儿花里胡哨的东西，自己理解哈，我就不讲解了</span></span><br><span class="line">				<span class="keyword">return</span> <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">					<span class="keyword">this</span>.$data[attrVal] = nodes[i].value</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;)(i))</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//我们解析一下fbb-text  和 fbb-html 指令</span></span><br><span class="line">		<span class="keyword">if</span>(node.hasAttrbuite(<span class="string">'fbb-html'</span>))&#123;</span><br><span class="line">			<span class="keyword">let</span> attrVal = node.getAttrbuite(<span class="string">'fbb-html'</span>)</span><br><span class="line">			<span class="keyword">this</span>.binding[attrVal].push(<span class="keyword">new</span> Watcher(node, <span class="string">'innerHTML'</span>, <span class="keyword">this</span>, attrVal))</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span>(node.hasAttrbuite(<span class="string">'fbb-text'</span>))&#123;</span><br><span class="line">			<span class="keyword">let</span> attrVal = node.getAttrbuite(<span class="string">'fbb-text'</span>)</span><br><span class="line">			<span class="keyword">this</span>.binding[attrVal].push(<span class="keyword">new</span> Watcher(node, <span class="string">'innerText'</span>, <span class="keyword">this</span>, attrVal))</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//这样我们的订阅者就存起来有了，有数据变动时让他执行一下updata就可以了</span></span><br></pre></td></tr></table></figure>
 <h3 id="6、执行订阅者"><a href="#6、执行订阅者" class="headerlink" title="6、执行订阅者"></a>6、执行订阅者</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//我们劫持一下data中的数据</span></span><br><span class="line">Fang.prototype.observer = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">let</span> value = <span class="string">''</span> <span class="comment">//新建一个局部变量</span></span><br><span class="line">	<span class="comment">//将data中的所有属性劫持</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">let</span> key <span class="keyword">in</span> <span class="keyword">this</span>.$data)&#123;</span><br><span class="line">		<span class="keyword">this</span>.binding[key] = [] <span class="comment">//  初始化</span></span><br><span class="line">		<span class="keyword">let</span> binding = <span class="keyword">this</span>.binding[key]</span><br><span class="line">		value = <span class="keyword">this</span>.$data[key]</span><br><span class="line">		<span class="built_in">Object</span>.defineProperty(<span class="keyword">this</span>.$data, key, &#123;</span><br><span class="line">			<span class="keyword">get</span>()&#123;</span><br><span class="line">				<span class="keyword">return</span> value</span><br><span class="line">			&#125;,</span><br><span class="line">			<span class="keyword">set</span>(v)&#123;</span><br><span class="line">				<span class="keyword">if</span>(v !== value)&#123; <span class="comment">//当数据没变就不需要触发watcher</span></span><br><span class="line">					value = v</span><br><span class="line">					binding.forEach(<span class="function"><span class="params">item</span> =&gt;</span> &#123;</span><br><span class="line">						item.updata() </span><br><span class="line">					&#125;)</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;)</span><br><span class="line">	&#125;</span><br><span class="line">&#125; </span><br><span class="line"><span class="comment">//这样应该就可以了</span></span><br><span class="line"><span class="comment">//代码是自己纯手写的，没有用编译器。估计会有一些错误，望多包涵。。。</span></span><br></pre></td></tr></table></figure>
-<p>其实自己以前听别人讲过vue双向绑定原理，当时没懂，现在总算时理解了，vue虚拟dom用的diff算法，那填看到一篇文章在介绍，准备这个礼拜在学习一下，再写一篇博客。自己最近在看es6的 proxy，听说vue3.0的双向绑定要通过proxy来实现，多学习一下总是没错的，也尝试一下用proxy简单实现一下双向绑定。自己要走的路还很长</p>
+<p>其实自己以前听别人讲过vue双向绑定原理，当时没懂，现在总算是理解了，vue虚拟dom用的diff算法，那填看到一篇文章在介绍，准备这个礼拜在学习一下，再写一篇博客。自己最近在看es6的 proxy，听说vue3.0的双向绑定要通过proxy来实现，多学习一下总是没错的，也尝试一下用proxy简单实现一下双向绑定。自己要走的路还很长</p>
 <p>哎，希望自己喜欢的人可以开开心心的。</p>
 
       
@@ -234,36 +439,6 @@
 
 
 
-  <article class="post">
-  <div class="post-content">
-    <header>
-      
-  
-    <h1 class="title"><a href="/2019/05/08/你好-Hexo/">你好,Hexo</a></h1>
-  
-
-      
-        <time datetime="2019-05-08T10:44:00.000Z">2019-05-08</time>
-      
-    </header>
-    <div class="entry">
-      
-        
-      
-    </div>
-      
-        
-        
-      
-      <div class="clearfix"></div>
-      
-  </div>
-</article>
-
-
-
-
-
 
 <nav id="pagination">
   
@@ -284,6 +459,10 @@
   <ul class="entry">
     
       <li>
+        <a href="/2019/06/08/VUE6组件6中通信方式/">VUE6组件6中通信方式</a>
+      </li>
+    
+      <li>
         <a href="/2019/05/16/vue双向绑定简单实现/">vue双向绑定简单实现</a>
       </li>
     
@@ -293,10 +472,6 @@
     
       <li>
         <a href="/2019/05/08/bootstrap-父子表学习/">Bootstrp 父子表的使用</a>
-      </li>
-    
-      <li>
-        <a href="/2019/05/08/你好-Hexo/">你好,Hexo</a>
       </li>
     
   </ul>

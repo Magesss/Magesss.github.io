@@ -1,0 +1,340 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <title>VUE6组件6中通信方式 › Magesss</title>
+  <meta name="author" content="magesss">
+  
+  <meta name="description" content="vue 组件传值的 6 中方式
+总结一下 vue 组件通信的 6 种方式，废话少说,直接开敲
+一、props/$emit​    1、子组件标签上定义的属性绑定父组件中的数据，然后子组件通过props接收
+&amp;lt;!--父组件 --&amp;gt;
+&amp;lt;template&amp;gt;
+    &amp;lt;div&amp;">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="VUE6组件6中通信方式">
+  <meta property="og:site_name" content="Magesss">
+
+  
+    <meta property="og:image" content>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Magesss" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+</head>
+</html>
+
+<body>
+  <header id="header"><div class="meta inner">
+  <h1><a href="/">Magesss</a></h1>
+  <h2><a href="/">技术爱好者</a></h2>
+  <nav id="main-nav">
+    <ul>
+      
+      <li><a href="/about">About</a></li>
+      
+      <li><a href="/archives">Archives</a></li>
+      
+      <li><a href="/atom.xml">RSS</a></li>
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+</div>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title">VUE6组件6中通信方式</h1>
+  
+
+      
+        <time datetime="2019-06-08T05:04:22.000Z">2019-06-08</time>
+      
+    </header>
+    <div class="entry">
+      
+        <p>vue 组件传值的 6 中方式</p>
+<p>总结一下 vue 组件通信的 6 种方式，废话少说,直接开敲</p>
+<h2 id="一、props-emit"><a href="#一、props-emit" class="headerlink" title="一、props/$emit"></a>一、props/$emit</h2><p>​    1、子组件标签上定义的属性绑定父组件中的数据，然后子组件通过props接收</p>
+<pre><code>&lt;!--父组件 --&gt;
+&lt;template&gt;
+    &lt;div&gt;
+        &lt;div @click=&quot;change&quot; :style=&quot;{&apos;color&apos;: color}&quot;&gt;parent&lt;/div&gt;
+        &lt;users :users=&quot;users&quot;&gt;&lt;/users&gt;
+    &lt;/div&gt;
+&lt;/template&gt;
+export default {
+    data () {
+        return {
+            users: [&apos;join&apos;, &apos;bucky&apos;, &apos;mariny&apos;]
+        }
+    }
+}
+&lt;!-- users 子组件 --&gt;
+&lt;template&gt;
+    &lt;div&gt;
+        {{users.join(', ')}}
+    &lt;/div&gt;
+&lt;/template&gt;
+export default{
+    props: {
+        users: {
+            type: Array,
+            default: () =&gt; []
+        }
+    }
+}
+</code></pre><p>​    2、子组件通过$emit将事件发送出去，执行父组件中定义的事件</p>
+<pre><code>    &lt;!-- 父组件 --&gt;
+    &lt;users @test=&apos;test&apos; :users=&quot;users&quot;&gt;&lt;/users&gt;
+    methods: {
+        test (data) {
+            console.log(&apos;接收到了，数据是:&apos;, data)
+        }
+    }
+
+&lt;!-- users 子组件 --&gt;
+&lt;div @click=&apos;send&apos;&gt;
+    {{users.join(', ')}}
+&lt;/div&gt;
+methods: {
+    send () {
+        this.$emit(&apos;test&apos;, &apos;from users data&apos;)
+    }
+}
+</code></pre><h2 id="二、-emit-on"><a href="#二、-emit-on" class="headerlink" title="二、$emit/$on"></a>二、$emit/$on</h2><pre><code>&lt;!--父组件--&gt;
+//先导入一个bus文件导出的vue
+const Event = () =&gt; import(&apos;./bus.js&apos;)
+//在 mounted 里面注册一个监听事件
+mounted () {
+    Event.$on(&apos;send-from&apos;, () =&gt; {
+        this.title = &apos;from组件修改的title！&apos;
+    })
+    Event.$on(&apos;send-users&apos;, () =&gt; {
+        this.title = &apos;users组件修改的title!&apos;
+    })
+}
+//在对应的子组件中通过 $emit 发送事件就可以
+&lt;!-- from 子组件--&gt;
+    //先导入 bus， 通过bus发送
+    const Event = () =&gt; import(&apos;./bus.js&apos;)
+    methods: {
+        test () {
+            Event.$em(&apos;send-from&apos;)
+        }
+    }
+&lt;!-- users 子组件--&gt;
+    const Event = () =&gt; import(&apos;./bus.js&apos;)
+    methods: {
+        test () {
+            Event.$em(&apos;send-users&apos;)
+        }
+    }
+</code></pre><h2 id="三、vuex"><a href="#三、vuex" class="headerlink" title="三、vuex"></a>三、vuex</h2><p>​    没什么好说的，傻瓜式步骤</p>
+<h2 id="四、-attr-listeners-Vue-2-4"><a href="#四、-attr-listeners-Vue-2-4" class="headerlink" title="四、$attr/$listeners (Vue 2.4)"></a>四、$attr/$listeners (Vue 2.4)</h2><p>​    组件之间的关系写成这样的，直观一点</p>
+<p>​    父组件 &gt; child-com1 -&gt; child-com2 -&gt; child-com3 一级一级嵌套</p>
+<pre><code>&lt;!-- 父组件 --&gt;
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;div class=&quot;title&quot;&gt;parent&lt;/div&gt;
+    &lt;div class=&quot;give&quot;&gt;传入第一代的属性：{{this.$data}}和 title&lt;/div&gt;
+    &lt;div class=&quot;child&quot;&gt;
+      &lt;child-com1
+        :foo=&quot;foo&quot;
+        :boo=&quot;boo&quot;
+        :zoo=&quot;zoo&quot;
+        :doo=&quot;doo&quot;
+        @Foo=&quot;Foo&quot;
+        @Boo=&quot;Boo&quot;
+        @Zoo=&quot;Zoo&quot;
+        @Doo=&quot;Doo&quot;
+        title=&quot;child-com1-title&quot;
+      &gt;&lt;/child-com1&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+data () {
+   return {
+     foo: &apos;foo&apos;,
+     boo: &apos;boo&apos;,
+     zoo: &apos;zoo&apos;,
+     doo: &apos;doo&apos;
+   }
+ }
+ methods: {
+    Foo (data) {
+      console.log(&apos;Foo&apos;, data)
+    },
+    Boo (data) {
+      console.log(&apos;Boo&apos;, data)
+    },
+    Zoo (data) {
+      console.log(&apos;Zoo&apos;, data)
+    },
+    Doo (data) {
+      console.log(&apos;Doo&apos;, data)
+    }
+  }
+
+ // chlid-com1一共传入5个属性， 4个自定义事件
+ &lt;!-- child-com1 --&gt;
+ &lt;template&gt;
+  &lt;div&gt;
+    &lt;div class=&quot;title&quot;&gt;{{title}}&lt;/div&gt;
+    &lt;div class=&quot;console&quot;&gt;$attrs： {{$attrs}}&lt;/div&gt;
+    &lt;child-com2 v-on=&quot;$listeners&quot; v-bind=&quot;$attrs&quot;&gt;&lt;/child-com2&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+// 通过$attrs存放着父组件传过来，但是没有通过props接收到的属性，也就是说，props中接收了一个title，所以这时的$attrs里面有4个而不是5个属性
+//事件通过$listeners接收，触发事件还是正常用$emit
+   //要向child-com2中传入这些属性直接通过v-bind=&apos;$attrs&apos; 就可以了,事件通过v-on
+    props: {
+        title: {
+          type: String
+        }
+      }
+</code></pre><p>附一张图</p>
+<p>​    <img src="/2019/06/08/VUE6组件6中通信方式/1.png" alt></p>
+<h2 id="五、provide-inject"><a href="#五、provide-inject" class="headerlink" title="五、provide/inject"></a>五、provide/inject</h2><p>​    vue 2.2.0新增的一个api，允许一个祖先组件向其所有子孙后代注入一个依赖，不论组件层次有多深。也就是说，祖先组件通过provide来提供变量，然后子孙组件通过inject来注入变量，主要解决跨级组件的通讯问题。</p>
+<pre><code>&lt;!-- parent --&gt;
+provide: {
+    name: &apos;6月5日到了，祝你生日快乐&apos;
+}
+&lt;!-- users --&gt;
+inject: [&apos;name&apos;]
+</code></pre><p>​    但是这并不是响应式的，要做成响应式的话可以向 provide 提供祖先组件的 this 的，但 this 东西太多，我们采用官方推荐的 Vue.observable 方法</p>
+<pre><code>&lt;!-- parent --&gt;
+provide () {
+    this.theme = Vue.observable({
+      color: this.color
+    })
+    return {
+      theme: this.theme
+    }
+ },
+ //修改的时候直接修改this.theme.color就可以了，子孙组建的数据也会变的
+&lt;!-- users --&gt;
+inject: {
+    theme: {
+        default: () =&gt; ({})
+    }
+},
+//子组件template为functional时推荐用 injections.theme.color
+</code></pre><h2 id="六、-parent-children-与-ref"><a href="#六、-parent-children-与-ref" class="headerlink" title="六、$parent/$children  与 ref"></a>六、$parent/$children  与 ref</h2><p>​    1、$parent 取父组件实例， $children 取子组件实例 </p>
+<p>​    2、ref如果时标签直接取真实dom节点，如果是组件，返回组建实例</p>
+<h2 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h2><p>​    父子通信：props 和 $emit、$parent和$children、ref、provide和inject、$attrs和$listeners</p>
+<p>​    兄弟通信：Bus 和 vuex</p>
+<p>​    跨级通信：Bus、vuex、provide和inject、$attrs和$listeners</p>
+<p>​    代码纯手打，拷贝可能会有问题，望包涵！</p>
+<hr>
+<p> 今天是你生日，在你看不到的地方默默祝你生日快乐！</p>
+
+      
+    </div>
+      
+      <footer>
+        
+        
+        
+  <div class="addthis addthis_toolbox addthis_default_style">
+    
+      <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+    
+      <a class="addthis_button_tweet"></a>
+    
+    
+      <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+    
+      <a class="addthis_button_pinterest_pinit" pi:pinit:layout="horizontal"></a>
+    
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js"></script>
+
+      
+      <div class="clearfix"></div>
+      </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+  
+</section>
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="Search">
+    <input type="hidden" name="q" value="site:yoursite.com">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">Recent Posts</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2019/06/08/VUE6组件6中通信方式/">VUE6组件6中通信方式</a>
+      </li>
+    
+      <li>
+        <a href="/2019/05/16/vue双向绑定简单实现/">vue双向绑定简单实现</a>
+      </li>
+    
+      <li>
+        <a href="/2019/05/09/函数尾调用/">函数尾调用</a>
+      </li>
+    
+      <li>
+        <a href="/2019/05/08/bootstrap-父子表学习/">Bootstrp 父子表的使用</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">Tag Cloud</h3>
+  <div class="entry">
+    <a href="/tags/Magesss/" style="font-size: 10px;">Magesss</a>
+  </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2019 magesss
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+
+</body>
+</html>
+
