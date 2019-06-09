@@ -3,7 +3,7 @@
 <head><meta name="generator" content="Hexo 3.8.0">
   <meta charset="utf-8">
   
-  <title>VUE6组件6中通信方式 › Magesss</title>
+  <title>VUE组件6中通信方式 › Magesss</title>
   <meta name="author" content="magesss">
   
   <meta name="description" content="vue 组件传值的 6 中方式
@@ -16,7 +16,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <meta property="og:title" content="VUE6组件6中通信方式">
+  <meta property="og:title" content="VUE组件6中通信方式">
   <meta property="og:site_name" content="Magesss">
 
   
@@ -57,7 +57,7 @@
     <header>
       
   
-    <h1 class="title">VUE6组件6中通信方式</h1>
+    <h1 class="title">VUE组件6中通信方式</h1>
   
 
       
@@ -115,7 +115,9 @@ methods: {
         this.$emit(&apos;test&apos;, &apos;from users data&apos;)
     }
 }
-</code></pre><h2 id="二、-emit-on"><a href="#二、-emit-on" class="headerlink" title="二、$emit/$on"></a>二、$emit/$on</h2><pre><code>&lt;!--父组件--&gt;
+</code></pre><h2 id="二、-emit-on"><a href="#二、-emit-on" class="headerlink" title="二、$emit/$on"></a>二、$emit/$on</h2><p>​    俗称公交车bus</p>
+<p>​    1、定义一个js文件，导出一个vue实例 ，子组件通过$emit 发送事件，父组件通过$on 接收</p>
+<pre><code>&lt;!--父组件--&gt;
 //先导入一个bus文件导出的vue
 const Event = () =&gt; import(&apos;./bus.js&apos;)
 //在 mounted 里面注册一个监听事件
@@ -293,7 +295,7 @@ inject: {
   <ul class="entry">
     
       <li>
-        <a href="/2019/06/08/VUE6组件6中通信方式/">VUE6组件6中通信方式</a>
+        <a href="/2019/06/08/VUE6组件6中通信方式/">VUE组件6中通信方式</a>
       </li>
     
       <li>

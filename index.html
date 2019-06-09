@@ -51,7 +51,7 @@
     <header>
       
   
-    <h1 class="title"><a href="/2019/06/08/VUE6组件6中通信方式/">VUE6组件6中通信方式</a></h1>
+    <h1 class="title"><a href="/2019/06/08/VUE6组件6中通信方式/">VUE组件6中通信方式</a></h1>
   
 
       
@@ -109,7 +109,9 @@ methods: {
         this.$emit(&apos;test&apos;, &apos;from users data&apos;)
     }
 }
-</code></pre><h2 id="二、-emit-on"><a href="#二、-emit-on" class="headerlink" title="二、$emit/$on"></a>二、$emit/$on</h2><pre><code>&lt;!--父组件--&gt;
+</code></pre><h2 id="二、-emit-on"><a href="#二、-emit-on" class="headerlink" title="二、$emit/$on"></a>二、$emit/$on</h2><p>​    俗称公交车bus</p>
+<p>​    1、定义一个js文件，导出一个vue实例 ，子组件通过$emit 发送事件，父组件通过$on 接收</p>
+<pre><code>&lt;!--父组件--&gt;
 //先导入一个bus文件导出的vue
 const Event = () =&gt; import(&apos;./bus.js&apos;)
 //在 mounted 里面注册一个监听事件
@@ -407,9 +409,9 @@ inject: {
 <p>​     <img src="/2019/05/08/bootstrap-父子表学习/father.png" alt></p>
 <p>​    这时，表格左侧就会出现一个 ‘+’  点击会出先另外一个表</p>
 <p>​    <img src="/2019/05/08/bootstrap-父子表学习/nodata.png" alt></p>
-<p>​    现在子表还是没有数据的，应为我们并没有给子表添加对应的数据，这时bootstrap有一个回调函数 ‘onExpandRow’ ，当点击 ‘+’ 时启用，接收三个参数，‘index， row， $detail’我们可以把加载字表的方法写在这个回调函数中<br>​<br>​    onExpandRow: function (index, row, $detail) {<br>​                var last = JSON.stringify(row);<br>​                onclick = row.id;<br>​                var parentId = row.id;<br>​                var prjLogBookProblemTable = $detail.html(‘<table></table>‘).find(‘table’);<br>​                $(prjLogBookProblemTable).bootstrapTable({<br>​                    columns: [],<br>​                    url: ‘./data.json’,<br>​                    method: ‘get’,<br>​                    queryParams: { parentId: parentId },<br>​                    contentType: “application/x-www-form-urlencoded; charset=UTF-8”,<br>​                    onLoadError: function () {  //加载失败时执行<br>​                        alert(‘失败’)<br>​                    },<br>​                })<br>​            }</p>
-<p>​    为了简单达到目的，本人对data.json数据重用，效果如下</p>
-<p><img src="/2019/05/08/bootstrap-父子表学习/img2.png" alt></p>
+<p>​    现在子表还是没有数据的，应为我们并没有给子表添加对应的数据，这时bootstrap有一个回调函数 ‘onExpandRow’ ，当点击 ‘+’ 时启用，接收三个参数，‘index， row， $detail’我们可以把加载字表的方法写在这个回调函数中<br>​<br>    onExpandRow: function (index, row, $detail) {<br>                var last = JSON.stringify(row);<br>                onclick = row.id;<br>                var parentId = row.id;<br>                var prjLogBookProblemTable = $detail.html(‘<table></table>‘).find(‘table’);<br>                $(prjLogBookProblemTable).bootstrapTable({<br>                    columns: [],<br>                    url: ‘./data.json’,<br>                    method: ‘get’,<br>                    queryParams: { parentId: parentId },<br>                    contentType: “application/x-www-form-urlencoded; charset=UTF-8”,<br>                    onLoadError: function () {  //加载失败时执行<br>                        alert(‘失败’)<br>                    },<br>                })<br>            }</p>
+<pre><code>为了简单达到目的，本人对data.json数据重用，效果如下
+</code></pre><p><img src="/2019/05/08/bootstrap-父子表学习/img2.png" alt></p>
 <p>​    </p>
 <h3 id="3、操作栏控制子表"><a href="#3、操作栏控制子表" class="headerlink" title="3、操作栏控制子表"></a>3、操作栏控制子表</h3><p>​    可以看到，想要效果已经出来了，但是我们的业务中不太会出现 ‘+’ 加载子表的情况，一般都是点击操作栏中的小图标或者按钮加载出子表，就像我写的这个一样，想要点击 ‘查看会员数据’ 出现子表，再点击字表关闭</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">我这儿写了一个函数，直接将主表columns中的操作栏的formatter等于这个函数了</span><br><span class="line">​<span class="function"><span class="keyword">function</span> <span class="title">actionFormatter</span>(<span class="params">value, row, index</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> id = value;</span><br><span class="line">        <span class="keyword">var</span> result = <span class="string">""</span>;</span><br><span class="line">        result += <span class="string">"&lt;a href='javascript:;' class='btn btn-xs green' onclick=\"EditViewById('"</span> + index + <span class="string">"', view='view')\" title='查看'&gt;查看会员数据&lt;/a&gt;"</span>;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">  	可以看到我们点击的时候会调用一个EditViewById方法</span><br></pre></td></tr></table></figure>
@@ -459,7 +461,7 @@ inject: {
   <ul class="entry">
     
       <li>
-        <a href="/2019/06/08/VUE6组件6中通信方式/">VUE6组件6中通信方式</a>
+        <a href="/2019/06/08/VUE6组件6中通信方式/">VUE组件6中通信方式</a>
       </li>
     
       <li>
