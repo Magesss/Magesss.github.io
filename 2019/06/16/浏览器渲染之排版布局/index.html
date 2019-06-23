@@ -1,0 +1,217 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <title>浏览器渲染之页面渲染 › Magesss</title>
+  <meta name="author" content="magesss">
+  
+  <meta name="description" content="本来今天想写一篇关于es6的  Generator 的用法和如何自动执行，但是感觉自己对  Generator 的用法和理解还是不到位，所以今天就吃吃老底，出一篇关于浏览器渲染，页面布局的文章,排版有点难看，将就一下啦~
+
+
+
+浏览器会解析三个东西：
+一个是HTML/SVG/XHTML，webkit">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="浏览器渲染之页面渲染">
+  <meta property="og:site_name" content="Magesss">
+
+  
+    <meta property="og:image" content>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Magesss" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+</head>
+</html>
+
+<body>
+  <header id="header"><div class="meta inner">
+  <h1><a href="/">Magesss</a></h1>
+  <h2><a href="/">技术爱好者</a></h2>
+  <nav id="main-nav">
+    <ul>
+      
+      <li><a href="/about">About</a></li>
+      
+      <li><a href="/archives">Archives</a></li>
+      
+      <li><a href="/atom.xml">RSS</a></li>
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+</div>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title">浏览器渲染之页面渲染</h1>
+  
+
+      
+        <time datetime="2019-06-16T11:02:07.000Z">2019-06-16</time>
+      
+    </header>
+    <div class="entry">
+      
+        <blockquote>
+<font color="#80868b" size="0">本来今天想写一篇关于es6的  Generator 的用法和如何自动执行，但是感觉自己对  Generator 的用法和理解还是不到位，所以今天就吃吃老底，出一篇关于浏览器渲染，页面布局的文章,排版有点难看，将就一下啦~</font>
+</blockquote>
+<p><img src="/2019/06/16/浏览器渲染之排版布局/大图.jpg" alt></p>
+<ul>
+<li><p>浏览器会解析三个东西：</p>
+<p>一个是HTML/SVG/XHTML，webkit有三个c++的类对应着三类文档。解析这三个东西会生成一个DOM树  dom tree</p>
+<p>解析css生成 css 规则树</p>
+<p>JavaScript 脚本，主要是通过DOM API 和 CSSOM API 来操作 DOM Tree 和 CSS Rule Tree</p>
+</li>
+<li><p>解析完成后，浏览器引擎通过 DOME Tree 和 CSS Rule Tree 来构造 Readering Tree。Readering Tree 并不等于 DOM 树，因为像一些Header 和 display: none 的东西就没必要放在渲染树中了。</p>
+<p>CSS 的 Rule Tree 主要是为了完成匹配并把 CSS Rule附加上Readering Tree 上的每一个Element。也就是DOM 节点。也就是所谓的Frame。</p>
+<p>然后计算每个Frame的位置，这又叫layout 和 reflow 过程</p>
+</li>
+<li><p>最后通过调用操作系统的 GUI 的 API 绘制</p>
+<pre><code>&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;web page parsing&lt;/title&gt;
+&lt;/head&gt;
+</code></pre><p> ​        <body></body></p>
+<pre><code>&lt;div&gt;
+    &lt;h1&gt;web page&lt;/h1&gt;
+    &lt;p&gt;this is a web page&lt;/p&gt;
+&lt;/div&gt;
+</code></pre><p> ​        <br> ​    </p>
+</li>
+</ul>
+<p>解析完成后会变成这样：</p>
+<p>​        <img src="/2019/06/16/浏览器渲染之排版布局/2.jpg" alt></p>
+<p><strong>css解析</strong></p>
+<p>我们的dom树是这个样子：</p>
+<p><img src="/2019/06/16/浏览器渲染之排版布局/dom.jpg" alt></p>
+<p>css 代码是这样的</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">doc</span>&#123;<span class="attribute">display</span>:block;<span class="attribute">text-indent</span>:<span class="number">1em</span>&#125;</span><br><span class="line"><span class="selector-tag">title</span>&#123;<span class="attribute">ddisplay</span>:block;<span class="attribute">font-size</span>:<span class="number">3em</span>&#125;</span><br><span class="line"><span class="selector-tag">para</span>&#123;<span class="attribute">display</span>:block&#125;</span><br><span class="line"><span class="selector-attr">[class='emph']</span>&#123;<span class="attribute">font-size</span>:italic&#125;</span><br></pre></td></tr></table></figure>
+<p>解析完成后是这样的</p>
+<p>​    <img src="/2019/06/16/浏览器渲染之排版布局/cssDome.jpg" alt></p>
+<p>css 匹配HTML 元素是一个相当复杂和有性能问题的事情，所以，DOM 树要小，CSS 尽量用 id 和 class，不要层层过度下去</p>
+<p>两棵树结合就是这样的, 叫做style context tree</p>
+<p>​    <img src="/2019/06/16/浏览器渲染之排版布局/render.jpg" alt></p>
+<p>这个流程是 fireFox ，fireFox基本上来说是用过 CSS 解析生成 CSS Rule Tree ，然后，通过比对 DOM 生成 Style Context Tree，然后fireFox 通过吧Style Context Tree 和其 Render Tree 关联上就完成了。Render Tree 会把一些不可兼得节点去除掉。而 fireFox 中所谓的 Frame 就是一个 DOM 节点，不要被其名字迷惑。</p>
+<p>webkit 不像 fireFox 要用两个树来干这个， webkit 也有 Style 对象，它直接把这个 Style 对象存在了对应的 DOM 节点上</p>
+<p><strong>渲染</strong></p>
+<p>基本上是四步</p>
+<p>​    1、计算 CSS 样式</p>
+<p>​    2、构建 Render Tree</p>
+<p>​    3、Layout - 定位坐标和大小，是否换行，position、overflow 等等各种属性</p>
+<p>​    4、开始开画</p>
+<p><img src="/2019/06/16/浏览器渲染之排版布局/paint.jpg" alt></p>
+
+      
+    </div>
+      
+      <footer>
+        
+        
+        
+  <div class="addthis addthis_toolbox addthis_default_style">
+    
+      <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+    
+      <a class="addthis_button_tweet"></a>
+    
+    
+      <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+    
+      <a class="addthis_button_pinterest_pinit" pi:pinit:layout="horizontal"></a>
+    
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js"></script>
+
+      
+      <div class="clearfix"></div>
+      </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+  
+</section>
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="Search">
+    <input type="hidden" name="q" value="site:yoursite.com">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">Recent Posts</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2019/06/23/base-64/">base 64</a>
+      </li>
+    
+      <li>
+        <a href="/2019/06/16/浏览器渲染之排版布局/">浏览器渲染之页面渲染</a>
+      </li>
+    
+      <li>
+        <a href="/2019/06/08/VUE6组件6中通信方式/">VUE组件6中通信方式</a>
+      </li>
+    
+      <li>
+        <a href="/2019/05/16/vue双向绑定简单实现/">vue双向绑定简单实现</a>
+      </li>
+    
+      <li>
+        <a href="/2019/05/09/函数尾调用/">函数尾调用</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">Tag Cloud</h3>
+  <div class="entry">
+    <a href="/tags/Magesss/" style="font-size: 10px;">Magesss</a>
+  </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2019 magesss
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+
+</body>
+</html>
+

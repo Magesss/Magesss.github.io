@@ -51,6 +51,169 @@
     <header>
       
   
+    <h1 class="title"><a href="/2019/06/23/base-64/">base 64</a></h1>
+  
+
+      
+        <time datetime="2019-06-23T07:06:50.000Z">2019-06-23</time>
+      
+    </header>
+    <div class="entry">
+      
+        <p>今天介绍一下base 64，工作中非常常用的一个东西，比如页面开发中像小于10k的图片浪费 http 请求就有点不合适了，不如转 base 64 直接插入页面。一直都停留在下一个插件，自动生成base 64 编码，前几天看 http 权威指南中介绍了一下，写文章总结一下。</p>
+<p>这是base 64 编码表</p>
+<p>​    <img src="/2019/06/23/base-64/base64.jpg" alt></p>
+<p>下面开始介绍：</p>
+<p>​    base 64 编码将一个 8为字节序列拆散成为 6 位的片段，并为每个6位的片段分配一个字符， 这个字符是base 64编码表中的64个字符之一。着64个输出字符都是很常见的，可以安全的放在http首部字段中。base 64 编码用 8 位字符来代表信息中的 6 位，所以base 64 编码字符串大约比原始值扩大了 33% 。</p>
+<p><strong>举个例子</strong></p>
+<p>一个字符串 ‘Ow!’ 是base 64 编码的，得到的4个字符的base 64 编码之 ‘T3ch’，它是以下面的方式工作的。</p>
+<ul>
+<li>字符串 ‘Ow!’ 被拆分成了3个8位的字节 (0x4F, 0x77, 0x21)</li>
+<li>这三个字节构成一个 24 位的二进制值010011110111011100100001</li>
+<li>这些位被划分为一些 6 位的序列010011、110111、011100、100001</li>
+<li>每个 6 位值都表示了从 0~63 之间的一个整数，对应 base 64 字母表中的字符。得到base 64 编码字符串是个4个字符的字符串 ‘T3ch’</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">8位字符</th>
+<th>0</th>
+<th>w</th>
+<th>!</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">8位值(十六进制)</td>
+<td>$4F</td>
+<td>$77</td>
+<td>$21</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:right">8位值(二进制)</td>
+<td>01001111</td>
+<td>01110111</td>
+<td>00100001</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:right">8位值(十进制)</td>
+<td>19</td>
+<td>55</td>
+<td>28</td>
+<td>33</td>
+</tr>
+<tr>
+<td style="text-align:right">base 67 码</td>
+<td>T</td>
+<td>3</td>
+<td>c</td>
+<td>h</td>
+</tr>
+</tbody>
+</table>
+<p>有一些情况下并并不能很好的平均分成6位的块，这时，就在序列的末尾填充零位，使二进制的长度成为24的倍数。这样得到的编码就可能尾部有很多  等号。</p>
+
+      
+    </div>
+      
+        
+        
+      
+      <div class="clearfix"></div>
+      
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title"><a href="/2019/06/16/浏览器渲染之排版布局/">浏览器渲染之页面渲染</a></h1>
+  
+
+      
+        <time datetime="2019-06-16T11:02:07.000Z">2019-06-16</time>
+      
+    </header>
+    <div class="entry">
+      
+        <blockquote>
+<font color="#80868b" size="0">本来今天想写一篇关于es6的  Generator 的用法和如何自动执行，但是感觉自己对  Generator 的用法和理解还是不到位，所以今天就吃吃老底，出一篇关于浏览器渲染，页面布局的文章,排版有点难看，将就一下啦~</font>
+</blockquote>
+<p><img src="/2019/06/16/浏览器渲染之排版布局/大图.jpg" alt></p>
+<ul>
+<li><p>浏览器会解析三个东西：</p>
+<p>一个是HTML/SVG/XHTML，webkit有三个c++的类对应着三类文档。解析这三个东西会生成一个DOM树  dom tree</p>
+<p>解析css生成 css 规则树</p>
+<p>JavaScript 脚本，主要是通过DOM API 和 CSSOM API 来操作 DOM Tree 和 CSS Rule Tree</p>
+</li>
+<li><p>解析完成后，浏览器引擎通过 DOME Tree 和 CSS Rule Tree 来构造 Readering Tree。Readering Tree 并不等于 DOM 树，因为像一些Header 和 display: none 的东西就没必要放在渲染树中了。</p>
+<p>CSS 的 Rule Tree 主要是为了完成匹配并把 CSS Rule附加上Readering Tree 上的每一个Element。也就是DOM 节点。也就是所谓的Frame。</p>
+<p>然后计算每个Frame的位置，这又叫layout 和 reflow 过程</p>
+</li>
+<li><p>最后通过调用操作系统的 GUI 的 API 绘制</p>
+<pre><code>&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;web page parsing&lt;/title&gt;
+&lt;/head&gt;
+</code></pre><p> ​        <body></body></p>
+<pre><code>&lt;div&gt;
+    &lt;h1&gt;web page&lt;/h1&gt;
+    &lt;p&gt;this is a web page&lt;/p&gt;
+&lt;/div&gt;
+</code></pre><p> ​        <br> ​    </p>
+</li>
+</ul>
+<p>解析完成后会变成这样：</p>
+<p>​        <img src="/2019/06/16/浏览器渲染之排版布局/2.jpg" alt></p>
+<p><strong>css解析</strong></p>
+<p>我们的dom树是这个样子：</p>
+<p><img src="/2019/06/16/浏览器渲染之排版布局/dom.jpg" alt></p>
+<p>css 代码是这样的</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">doc</span>&#123;<span class="attribute">display</span>:block;<span class="attribute">text-indent</span>:<span class="number">1em</span>&#125;</span><br><span class="line"><span class="selector-tag">title</span>&#123;<span class="attribute">ddisplay</span>:block;<span class="attribute">font-size</span>:<span class="number">3em</span>&#125;</span><br><span class="line"><span class="selector-tag">para</span>&#123;<span class="attribute">display</span>:block&#125;</span><br><span class="line"><span class="selector-attr">[class='emph']</span>&#123;<span class="attribute">font-size</span>:italic&#125;</span><br></pre></td></tr></table></figure>
+<p>解析完成后是这样的</p>
+<p>​    <img src="/2019/06/16/浏览器渲染之排版布局/cssDome.jpg" alt></p>
+<p>css 匹配HTML 元素是一个相当复杂和有性能问题的事情，所以，DOM 树要小，CSS 尽量用 id 和 class，不要层层过度下去</p>
+<p>两棵树结合就是这样的, 叫做style context tree</p>
+<p>​    <img src="/2019/06/16/浏览器渲染之排版布局/render.jpg" alt></p>
+<p>这个流程是 fireFox ，fireFox基本上来说是用过 CSS 解析生成 CSS Rule Tree ，然后，通过比对 DOM 生成 Style Context Tree，然后fireFox 通过吧Style Context Tree 和其 Render Tree 关联上就完成了。Render Tree 会把一些不可兼得节点去除掉。而 fireFox 中所谓的 Frame 就是一个 DOM 节点，不要被其名字迷惑。</p>
+<p>webkit 不像 fireFox 要用两个树来干这个， webkit 也有 Style 对象，它直接把这个 Style 对象存在了对应的 DOM 节点上</p>
+<p><strong>渲染</strong></p>
+<p>基本上是四步</p>
+<p>​    1、计算 CSS 样式</p>
+<p>​    2、构建 Render Tree</p>
+<p>​    3、Layout - 定位坐标和大小，是否换行，position、overflow 等等各种属性</p>
+<p>​    4、开始开画</p>
+<p><img src="/2019/06/16/浏览器渲染之排版布局/paint.jpg" alt></p>
+
+      
+    </div>
+      
+        
+        
+      
+      <div class="clearfix"></div>
+      
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  <div class="post-content">
+    <header>
+      
+  
     <h1 class="title"><a href="/2019/06/08/VUE6组件6中通信方式/">VUE组件6中通信方式</a></h1>
   
 
@@ -461,6 +624,14 @@ inject: {
   <ul class="entry">
     
       <li>
+        <a href="/2019/06/23/base-64/">base 64</a>
+      </li>
+    
+      <li>
+        <a href="/2019/06/16/浏览器渲染之排版布局/">浏览器渲染之页面渲染</a>
+      </li>
+    
+      <li>
         <a href="/2019/06/08/VUE6组件6中通信方式/">VUE组件6中通信方式</a>
       </li>
     
@@ -470,10 +641,6 @@ inject: {
     
       <li>
         <a href="/2019/05/09/函数尾调用/">函数尾调用</a>
-      </li>
-    
-      <li>
-        <a href="/2019/05/08/bootstrap-父子表学习/">Bootstrp 父子表的使用</a>
       </li>
     
   </ul>
